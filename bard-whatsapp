@@ -1,0 +1,140 @@
+#!php
+
+// Este archivo contiene el código que inicia la aplicación de Bard.
+
+// Importamos las dependencias de la aplicación.
+require_once __DIR__ . '/vendor/autoload.php';
+
+// Iniciamos la aplicación.
+$app = new App();
+$app->run();
+
+class App
+{
+    // Este método inicia la aplicación.
+    public function run()
+    {
+        // Obtenemos la configuración de la aplicación.
+        $config = $this->getConfig();
+
+        // Creamos el controlador de la aplicación.
+        $controller = new Controller($config);
+
+        // Procesamos la solicitud del usuario.
+        $controller->processRequest();
+    }
+
+    // Este método obtiene la configuración de la aplicación.
+    private function getConfig()
+    {
+        // Cargamos el archivo de configuración.
+        $config = require __DIR__ . '/.env';
+
+        // Devolvemos la configuración de la aplicación.
+        return $config;
+    }
+}
+
+class Controller
+{
+    // Este constructor recibe la configuración de la aplicación.
+    public function __construct($config)
+    {
+        // Guardamos la configuración de la aplicación.
+        $this->config = $config;
+    }
+
+    // Este método procesa la solicitud del usuario.
+    public function processRequest()
+    {
+        // Obtenemos el método HTTP de la solicitud.
+        $method = $_SERVER['REQUEST_METHOD'];
+
+        // Si el método HTTP es GET, mostramos la página principal de la aplicación.
+        if ($method === 'GET') {
+            $this->showIndex();
+        }
+
+        // Si el método HTTP es POST, procesamos la solicitud del usuario.
+        if ($method === 'POST') {
+            $this->processPost();
+        }
+    }
+
+    // Este método muestra la página principal de la aplicación.
+    private function showIndex()
+    {
+        // Incluimos la plantilla de la página principal.
+        include __DIR__ . '/views/index.php';
+    }
+
+    // Este método procesa la solicitud del usuario.
+    private function processPost()
+    {
+        // Obtenemos los datos del formulario.
+        $data = $this->getPostData();
+
+        // Procesamos los datos del formulario.
+        $this->processData($data);
+
+        // Redirigimos al usuario a la página principal.
+        header('Location: /');
+    }
+
+    // Este método obtiene los datos del formulario.
+    private function getPostData()
+    {
+        // Devolvemos los datos del formulario.
+        return $_POST;
+    }
+
+    // Este método procesa los datos del formulario.
+    private function processData($data)
+    {
+        // Obtenemos el mensaje del usuario.
+        $message = $data['message'];
+
+        // Generamos una respuesta para el usuario.
+        $response = Bard::generateResponse($message);
+
+        // Imprimimos la respuesta para el usuario.
+        echo $response;
+    }
+}
+
+class Bard
+{
+    // Este método genera una respuesta para el usuario.
+    public static function generateResponse($message)
+    {
+        // Obtenemos el modelo de lenguaje de Bard.
+        $model = BardModel::getModel();
+
+        // Generamos una respuesta para el mensaje del usuario.
+        $response = $model->generateResponse($message);
+
+        // Devolvemos la respuesta para el usuario.
+        return $response;
+    }
+}
+
+class BardModel
+{
+    // Este método obtiene el modelo de lenguaje de Bard.
+    public static function getModel()
+    {
+        // Importamos el modelo de lenguaje de Bard.
+        require_once __DIR__ . '/models/bard.php';
+
+        // Devolvemos el modelo de lenguaje de Bard.
+        return new BardModel();
+    }
+
+    // Este método genera una respuesta para un mensaje.
+    public function generateResponse($message)
+    {
+        // Obtenemos la respuesta del modelo de lenguaje.
+        $response = $this->model->generateResponse($message);
+
+        // Devolvemos la respuesta del modelo de lenguaje.
+        return $response;
